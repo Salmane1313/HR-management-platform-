@@ -30,6 +30,12 @@ public class UserService {
         User saved = userRepository.save(user);
         return toResponse(saved);
         }
+    public UserResponse getByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + email));
+        return toResponse(user);
+    }
+
     public UserResponse updateRole(UUID userId, UpdateUserRoleRequest request){
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new IllegalArgumentException("User not found: "+ userId));

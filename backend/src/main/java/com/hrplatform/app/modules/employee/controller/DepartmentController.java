@@ -16,6 +16,7 @@ import java.util.UUID;
 @RequestMapping("/api/departments")
 public class DepartmentController {
 
+
     private final DepartmentService departmentService;
 
     public DepartmentController(DepartmentService departmentService) {
