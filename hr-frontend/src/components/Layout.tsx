@@ -2,6 +2,18 @@ import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth, useHasAnyRole } from '../auth/AuthContext'
 import { ROLE_LABEL } from '../lib/labels'
+import { Icon, type IconName } from './Icon'
+
+const NAV_ITEMS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
+  { to: '/', label: 'Accueil', icon: 'home', end: true },
+  { to: '/leaves', label: 'Mes congés', icon: 'calendar' },
+  { to: '/team-leaves', label: 'Équipe', icon: 'users' },
+  { to: '/employees', label: 'Employés', icon: 'building' },
+  { to: '/departments', label: 'Départements', icon: 'clipboard' },
+  { to: '/users', label: 'Comptes', icon: 'shield' },
+  { to: '/notifications', label: 'Notifications', icon: 'bell' },
+  { to: '/audit', label: 'Audit', icon: 'clipboard' },
+]
 
 export function Layout() {
   const { email, role, unreadCount, logout } = useAuth()
@@ -20,6 +32,13 @@ export function Layout() {
     setMenuOpen(false)
   }
 
+  const visible = NAV_ITEMS.filter((item) => {
+    if (['team-leaves'].includes(item.to.slice(1))) return canManageTeam
+    if (['employees', 'departments', 'audit'].includes(item.to.slice(1))) return canManageStaff
+    if (item.to === '/users') return isAdmin
+    return true
+  })
+
   return (
     <div className="app-shell">
       <header className="mobile-bar">
@@ -32,27 +51,35 @@ export function Layout() {
       {menuOpen && <button type="button" className="sidebar-backdrop" aria-label="Fermer le menu" onClick={closeMenu} />}
 
       <aside className={menuOpen ? 'sidebar open' : 'sidebar'}>
-        <h2>Plateforme RH</h2>
-        <p className="sidebar-meta">{email}</p>
-        {role && <p className="sidebar-role">{ROLE_LABEL[role]}</p>}
+        <div className="sidebar-header">
+          <span className="sidebar-logo" aria-hidden="true">
+            HR
+          </span>
+          <h2>Plateforme RH</h2>
+        </div>
+
+        <div className="sidebar-user">
+          <span className="avatar" aria-hidden="true">
+            {(email ?? '?').charAt(0).toUpperCase()}
+          </span>
+          <span className="sidebar-user-info">
+            <span className="sidebar-meta">{email}</span>
+            {role && <span className="sidebar-role">{ROLE_LABEL[role]}</span>}
+          </span>
+        </div>
 
         <nav className="sidebar-nav" onClick={closeMenu}>
-          <NavLink to="/" end>
-            Accueil
-          </NavLink>
-          <NavLink to="/leaves">Mes congés</NavLink>
-          {canManageTeam && <NavLink to="/team-leaves">Équipe</NavLink>}
-          {canManageStaff && <NavLink to="/employees">Employés</NavLink>}
-          {canManageStaff && <NavLink to="/departments">Départements</NavLink>}
-          {isAdmin && <NavLink to="/users">Comptes</NavLink>}
-          <NavLink to="/notifications">
-            Notifications
-            {unreadCount > 0 && <span className="nav-badge">{unreadCount}</span>}
-          </NavLink>
-          {canManageStaff && <NavLink to="/audit">Audit</NavLink>}
+          {visible.map(({ to, label, icon, end }) => (
+            <NavLink key={to} to={to} end={end}>
+              <Icon name={icon} />
+              <span>{label}</span>
+              {to === '/notifications' && unreadCount > 0 && <span className="nav-badge">{unreadCount}</span>}
+            </NavLink>
+          ))}
         </nav>
 
         <button type="button" className="sidebar-logout" onClick={handleLogout}>
+          <Icon name="logout" />
           Se déconnecter
         </button>
       </aside>
