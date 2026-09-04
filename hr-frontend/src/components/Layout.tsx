@@ -21,6 +21,7 @@ export function Layout() {
   const isAdmin = useHasAnyRole('ADMIN')
   const canManageTeam = useHasAnyRole('MANAGER', 'HR', 'ADMIN')
   const canManageStaff = useHasAnyRole('HR', 'ADMIN')
+  const canViewEmployees = useHasAnyRole('HR', 'ADMIN', 'MANAGER')
   const [menuOpen, setMenuOpen] = useState(false)
 
   function handleLogout() {
@@ -34,7 +35,8 @@ export function Layout() {
 
   const visible = NAV_ITEMS.filter((item) => {
     if (['team-leaves'].includes(item.to.slice(1))) return canManageTeam
-    if (['employees', 'departments', 'audit'].includes(item.to.slice(1))) return canManageStaff
+    if (item.to === '/employees') return canViewEmployees
+    if (['departments', 'audit'].includes(item.to.slice(1))) return canManageStaff
     if (item.to === '/users') return isAdmin
     return true
   })

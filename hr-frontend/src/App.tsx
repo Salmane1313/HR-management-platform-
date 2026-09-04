@@ -39,7 +39,7 @@ export default function App() {
             <Route
               path="/employees"
               element={
-                <RoleRoute roles={['HR', 'ADMIN']}>
+                <RoleRoute roles={['HR', 'ADMIN', 'MANAGER']}>
                   <EmployeesPage />
                 </RoleRoute>
               }

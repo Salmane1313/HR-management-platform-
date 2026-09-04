@@ -16,6 +16,7 @@ export function HomePage() {
   const { email, role } = useAuth()
   const canManageStaff = useHasAnyRole('HR', 'ADMIN')
   const canManageTeam = useHasAnyRole('MANAGER', 'HR', 'ADMIN')
+  const canViewEmployees = useHasAnyRole('HR', 'ADMIN', 'MANAGER')
   const [profile, setProfile] = useState<EmployeeResponse | null>(null)
   const [balance, setBalance] = useState<LeaveBalanceResponse | null>(null)
   const [leaves, setLeaves] = useState<LeaveResponse[]>([])
@@ -109,7 +110,7 @@ export function HomePage() {
             Valider l’équipe
           </Link>
         )}
-        {canManageStaff && (
+        {canViewEmployees && (
           <Link to="/employees" className="quick-link">
             Gérer les employés
           </Link>
